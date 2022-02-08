@@ -1,4 +1,3 @@
-HOLAA
 # Let's start to make money
 
 ## How you'll be assessed
