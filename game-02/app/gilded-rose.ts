@@ -1,69 +1,72 @@
 export class Item {
-    name: string;
-    sellIn: number;
-    quality: number;
+  name: string;
+  sellIn: number;
+  quality: number;
 
-    constructor(name, sellIn, quality) {
-        this.name = name;
-        this.sellIn = sellIn;
-        this.quality = quality;
-    }
+  constructor(name, sellIn, quality) {
+    this.name = name;
+    this.sellIn = sellIn;
+    this.quality = quality;
+  }
 }
 
 export class GildedRose {
-    items: Array<Item>;
+  items: Array<Item>;
 
-    constructor(items = [] as Array<Item>) {
-        this.items = items;
+  constructor(items = [] as Array<Item>) {
+    this.items = items;
+  }
+
+  updateQuality() {
+    var normalAdjust = 1; 
+    var specialAdjust, finalQuality;
+    this.items.forEach((it) => {
+      it.sellIn--; //decremento un dia
+      switch (it.name) {
+        case "Sulfuras":
+          finalQuality = 80;
+          break;
+        case "Backstage passes":
+        case "Aged Brie":
+          finalQuality = incrementQuality(normalAdjust, it.quality, it.sellIn);
+          break;
+        case "Conjured":
+          normalAdjust = normalAdjust * 2;
+        default:
+          specialAdjust = normalAdjust * 2;
+          finalQuality = decrementQuality(normalAdjust, specialAdjust, it.quality, it.sellIn);
+          break;
+      }
+      finalQuality > 50
+        ? (finalQuality = 50)
+        : finalQuality <= 0
+        ? (finalQuality = 0)
+        : null;
+      
+      it.quality = finalQuality;
+    });
+    return this.items;
+
+    //////
+    function decrementQuality(normalAdjust, specialAdjust, quality, restDays) {
+      let resultQuality;
+      restDays > 0
+        ? (resultQuality = quality - normalAdjust)
+        : (resultQuality = quality - specialAdjust);
+      return resultQuality;
     }
-
-    updateQuality() {
-        for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].name != 'Aged Brie' && this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-                if (this.items[i].quality > 0) {
-                    if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-                        this.items[i].quality = this.items[i].quality - 1
-                    }
-                }
-            } else {
-                if (this.items[i].quality < 50) {
-                    this.items[i].quality = this.items[i].quality + 1
-                    if (this.items[i].name == 'Backstage passes to a TAFKAL80ETC concert') {
-                        if (this.items[i].sellIn < 11) {
-                            if (this.items[i].quality < 50) {
-                                this.items[i].quality = this.items[i].quality + 1
-                            }
-                        }
-                        if (this.items[i].sellIn < 6) {
-                            if (this.items[i].quality < 50) {
-                                this.items[i].quality = this.items[i].quality + 1
-                            }
-                        }
-                    }
-                }
-            }
-            if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-                this.items[i].sellIn = this.items[i].sellIn - 1;
-            }
-            if (this.items[i].sellIn < 0) {
-                if (this.items[i].name != 'Aged Brie') {
-                    if (this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-                        if (this.items[i].quality > 0) {
-                            if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-                                this.items[i].quality = this.items[i].quality - 1
-                            }
-                        }
-                    } else {
-                        this.items[i].quality = this.items[i].quality - this.items[i].quality
-                    }
-                } else {
-                    if (this.items[i].quality < 50) {
-                        this.items[i].quality = this.items[i].quality + 1
-                    }
-                }
-            }
-        }
-
-        return this.items;
+    ///////
+    function incrementQuality(normalAdjust, quality, restDays) {
+      let resultQuality, adjustPlus;
+      restDays <= 0
+        ? (resultQuality = 0)
+        : (restDays <= 5
+            ? (adjustPlus = 3)
+            : restDays > 5 && restDays <= 10
+            ? (adjustPlus = 2)
+            : (adjustPlus = normalAdjust),
+          (resultQuality = quality + adjustPlus));
+      return resultQuality;
     }
+  }
 }
